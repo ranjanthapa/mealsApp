@@ -6,10 +6,10 @@ import "package:transparent_image/transparent_image.dart";
 
 class MealItem extends StatelessWidget {
   final Meal meal;
-  final void Function(Meal meal) onToggleFavourite;
 
   const MealItem(
-      {super.key, required this.meal, required this.onToggleFavourite});
+      {super.key, required this.meal,
+      });
 
   String get complexityText {
     return meal.complexity.name[0].toUpperCase() +
@@ -25,7 +25,6 @@ class MealItem extends StatelessWidget {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (ctx) => MealDetailScreen(
               meal: meal,
-              onToggleFavourite: onToggleFavourite,
             )));
   }
 
@@ -76,9 +75,11 @@ class MealItem extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        MealItemTrait(
-                            icon: Icons.schedule,
-                            label: '${meal.duration} min'),
+                        Flexible(
+                          child: MealItemTrait(
+                              icon: Icons.schedule,
+                              label: '${meal.duration} min'),
+                        ),
                         const SizedBox(
                           width: 12,
                         ),

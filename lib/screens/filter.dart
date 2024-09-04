@@ -1,57 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum Filter { glutenFree, vegan, lactoseFree, vegetarian }
+import '../provider/filters_provider.dart';
 
-class FilterScreen extends StatefulWidget {
-  const FilterScreen({super.key, required this.currentFilter});
-  final Map<Filter, bool> currentFilter;
 
-  @override
-  State<StatefulWidget> createState() {
-    return _FilterScreenState();
-  }
-}
-
-class _FilterScreenState extends State<FilterScreen> {
-  var _glutenFilterSet = false;
-  var _lactusFilterSet = false;
-  var _veganFilterSet = false;
-  var _vegetarianFilterSet = false;
+class FilterScreen extends ConsumerWidget {
+  const FilterScreen({super.key});
 
   @override
-  void initState() {
-    super.initState();
-    _glutenFilterSet = widget.currentFilter[Filter.glutenFree]!;
-    _lactusFilterSet = widget.currentFilter[Filter.lactoseFree]!;
-    _veganFilterSet = widget.currentFilter[Filter.vegan]!;
-    _vegetarianFilterSet = widget.currentFilter[Filter.vegetarian]!;
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activeFilter = ref.watch(filterProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Filter"),
       ),
-      body: PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) {
-          if (didPop) return;
-          Navigator.of(context).pop({
-            Filter.vegan: _veganFilterSet,
-            Filter.vegetarian: _vegetarianFilterSet,
-            Filter.lactoseFree: _lactusFilterSet,
-            Filter.glutenFree: _glutenFilterSet
-          });
-        },
-        child: Column(
+      body: 
+        Column(
           children: [
             SwitchListTile(
-              value: _glutenFilterSet,
+              value: activeFilter[Filter.glutenFree]!,
               onChanged: (isChecked) {
-                setState(() {
-                  _glutenFilterSet = isChecked;
-                });
+                ref.read(filterProvider.notifier).setFilter(Filter.glutenFree, isChecked);
               },
               title: Text(
                 "Gluten Free",
@@ -69,11 +38,10 @@ class _FilterScreenState extends State<FilterScreen> {
               activeColor: Theme.of(context).colorScheme.tertiary,
             ),
             SwitchListTile(
-              value: _lactusFilterSet,
+              value: activeFilter[Filter.lactoseFree]!,
               onChanged: (isChecked) {
-                setState(() {
-                  _lactusFilterSet = isChecked;
-                });
+                ref.read(filterProvider.notifier).setFilter(Filter.lactoseFree, isChecked);
+
               },
               title: Text(
                 "Lactus Free",
@@ -91,11 +59,9 @@ class _FilterScreenState extends State<FilterScreen> {
               activeColor: Theme.of(context).colorScheme.tertiary,
             ),
             SwitchListTile(
-              value: _veganFilterSet,
+              value: activeFilter[Filter.vegan]!,
               onChanged: (isChecked) {
-                setState(() {
-                  _veganFilterSet = isChecked;
-                });
+                ref.read(filterProvider.notifier).setFilter(Filter.vegan, isChecked);
               },
               title: Text(
                 "Vegan",
@@ -113,11 +79,9 @@ class _FilterScreenState extends State<FilterScreen> {
               activeColor: Theme.of(context).colorScheme.tertiary,
             ),
             SwitchListTile(
-              value: _vegetarianFilterSet,
+              value: activeFilter[Filter.vegetarian]!,
               onChanged: (isChecked) {
-                setState(() {
-                  _vegetarianFilterSet = isChecked;
-                });
+                ref.read(filterProvider.notifier).setFilter(Filter.vegetarian, isChecked);
               },
               title: Text(
                 "Vegetarian",
@@ -135,7 +99,6 @@ class _FilterScreenState extends State<FilterScreen> {
               activeColor: Theme.of(context).colorScheme.tertiary,
             ),
           ],
-        ),
       ),
     );
   }

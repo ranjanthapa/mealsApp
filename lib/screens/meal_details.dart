@@ -1,23 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import "package:meals_app/models/meal.dart";
+import 'package:meals_app/provider/favourite_meal.dart';
 
-class MealDetailScreen extends StatelessWidget {
+class MealDetailScreen extends ConsumerWidget {
   const MealDetailScreen(
-      {super.key, required this.meal, required this.onToggleFavourite});
+      {super.key, required this.meal,
+      });
   final Meal meal;
-  final void Function(Meal meal) onToggleFavourite;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef  ref) {
+    final favouriteMeals = ref.watch(favouriteMealsProvider);
+    final isFavouriteMeal = favouriteMeals.contains(meal);
     return Scaffold(
       appBar: AppBar(
         title: Text(meal.title),
         actions: [
           IconButton(
               onPressed: () {
-                onToggleFavourite(meal);
+                final wasAdded = ref.read(
+                  favouriteMealsProvider.notifier // notifier calls the  FavouriteMealsNotifier
+                ).toggleFavouriteMeal(meal);
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            wasAdded ? "Meal added to favourite list" : "Meal remove from the favourite list")
+                    )
+                );
+
               },
-              icon: const Icon(Icons.star))
+              icon:  Icon(isFavouriteMeal ? Icons.star : Icons.star_border))
         ],
       ),
       body: SingleChildScrollView(
@@ -31,7 +46,7 @@ class MealDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              "Ingediants",
+              "Ingredients",
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                   fontWeight: FontWeight.bold),
